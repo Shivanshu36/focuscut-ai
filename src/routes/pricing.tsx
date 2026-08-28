@@ -38,12 +38,14 @@ function PricingPage() {
   const buy = async (
     itemType: "plan" | "credits",
     itemId: string,
+    amount: number,
     onSuccess: () => void,
   ) => {
     try {
       const result = await startCheckout({
         itemType,
         itemId,
+        amount,
         userName: user?.name,
         userEmail: user?.email,
       });
