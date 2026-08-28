@@ -16,6 +16,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RemoveBackgroundRouteImport } from './routes/remove-background'
 import { Route as SignupRouteImport } from './routes/signup'
 
@@ -54,6 +55,11 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RemoveBackgroundRoute = RemoveBackgroundRouteImport.update({
   id: '/remove-background',
   path: '/remove-background',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/remove-background': typeof RemoveBackgroundRoute
   '/signup': typeof SignupRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/remove-background': typeof RemoveBackgroundRoute
   '/signup': typeof SignupRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/remove-background': typeof RemoveBackgroundRoute
   '/signup': typeof SignupRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/login'
     | '/pricing'
+    | '/privacy'
     | '/remove-background'
     | '/signup'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/login'
     | '/pricing'
+    | '/privacy'
     | '/remove-background'
     | '/signup'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/login'
     | '/pricing'
+    | '/privacy'
     | '/remove-background'
     | '/signup'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
   RemoveBackgroundRoute: typeof RemoveBackgroundRoute
   SignupRoute: typeof SignupRoute
 }
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/remove-background': {
       id: '/remove-background'
       path: '/remove-background'
@@ -223,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
   RemoveBackgroundRoute: RemoveBackgroundRoute,
   SignupRoute: SignupRoute,
 }
