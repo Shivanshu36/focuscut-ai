@@ -10,6 +10,7 @@ import { removeBackground } from "@/api/backgroundRemoval";
 import { useAuth } from "@/context/AuthContext";
 import { CREDITS } from "@/config/app";
 import { compositeOnColor, downloadDataUrl } from "@/utils/image";
+import { takePendingFile } from "@/lib/pending-upload";
 import { cn } from "@/lib/utils";
 
 type Stage = "upload" | "processing" | "result" | "error";
@@ -96,6 +97,12 @@ export function ToolWorkspace() {
     },
     [addHistory, consumeCredit, user],
   );
+
+  useEffect(() => {
+    const pending = takePendingFile();
+    if (pending) void process(pending);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const reset = () => {
     setStage("upload");
