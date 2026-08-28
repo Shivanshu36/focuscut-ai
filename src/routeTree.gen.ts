@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as RemoveBackgroundRouteImport } from './routes/remove-background'
 import { Route as SignupRouteImport } from './routes/signup'
 
@@ -22,6 +23,11 @@ const IndexRoute = IndexRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RemoveBackgroundRoute = RemoveBackgroundRouteImport.update({
@@ -38,12 +44,14 @@ const SignupRoute = SignupRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/remove-background': typeof RemoveBackgroundRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/remove-background': typeof RemoveBackgroundRoute
   '/signup': typeof SignupRoute
 }
@@ -51,20 +59,23 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/remove-background': typeof RemoveBackgroundRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/remove-background' | '/signup'
+  fullPaths: '/' | '/login' | '/pricing' | '/remove-background' | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/remove-background' | '/signup'
-  id: '__root__' | '/' | '/login' | '/remove-background' | '/signup'
+  to: '/' | '/login' | '/pricing' | '/remove-background' | '/signup'
+  id:
+    '__root__' | '/' | '/login' | '/pricing' | '/remove-background' | '/signup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  PricingRoute: typeof PricingRoute
   RemoveBackgroundRoute: typeof RemoveBackgroundRoute
   SignupRoute: typeof SignupRoute
 }
@@ -83,6 +94,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/remove-background': {
@@ -105,6 +123,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  PricingRoute: PricingRoute,
   RemoveBackgroundRoute: RemoveBackgroundRoute,
   SignupRoute: SignupRoute,
 }

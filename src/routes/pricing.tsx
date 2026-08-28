@@ -36,7 +36,7 @@ function PricingPage() {
   const { user, setPlan, addCredits } = useAuth();
 
   const buy = async (
-    itemType: "plan" | "pack",
+    itemType: "plan" | "credits",
     itemId: string,
     onSuccess: () => void,
   ) => {
@@ -107,7 +107,7 @@ function PricingPage() {
               <Button
                 variant="brandOutline"
                 className="mt-5 w-full"
-                onClick={() => buy("pack", pack.id, () => addCredits(pack.credits))}
+                onClick={() => buy("credits", pack.id, () => addCredits(pack.credits))}
               >
                 Buy credits
               </Button>
