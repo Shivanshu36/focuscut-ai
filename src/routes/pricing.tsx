@@ -46,8 +46,7 @@ function PricingPage() {
         itemType,
         itemId,
         amount,
-        userName: user?.name,
-        userEmail: user?.email,
+        ...(user ? { userName: user.name, userEmail: user.email } : {}),
       });
       if (result.success) {
         onSuccess();
@@ -80,7 +79,7 @@ function PricingPage() {
             onSelect={() =>
               plan.price === 0
                 ? undefined
-                : buy("plan", plan.id, () => {
+                : buy("plan", plan.id, plan.price, () => {
                     setPlan(plan.id);
                     addCredits(plan.credits);
                   })
@@ -109,7 +108,7 @@ function PricingPage() {
               <Button
                 variant="brandOutline"
                 className="mt-5 w-full"
-                onClick={() => buy("credits", pack.id, () => addCredits(pack.credits))}
+                onClick={() => buy("credits", pack.id, pack.price, () => addCredits(pack.credits))}
               >
                 Buy credits
               </Button>
