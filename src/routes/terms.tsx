@@ -24,7 +24,7 @@ const SECTIONS = [
   },
   {
     title: "Credits and billing",
-    body: "One background removal consumes one credit. Plan credits refresh each billing period; purchased credit packs do not expire. Subscriptions renew until cancelled.",
+    body: "One background removal consumes one credit. Plan credits refresh each billing period; purchased credit packs do not expire. Subscriptions renew until cancelled. We do not store your card, bank or UPI credentials.",
   },
   {
     title: "Acceptable use",
@@ -40,7 +40,7 @@ const SECTIONS = [
   },
   {
     title: "Refunds",
-    body: "Unused subscription time may be refundable at our discretion. Credits already consumed are non-refundable.",
+    body: "Refund eligibility and cancellation rules are described in our Refund and Cancellation Policy. Credits already consumed for completed processing are non-refundable except where required by applicable law.",
   },
 ];
 

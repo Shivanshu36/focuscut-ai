@@ -35,25 +35,19 @@ export const Route = createFileRoute("/pricing")({
 function PricingPage() {
   const { user, setPlan, addCredits } = useAuth();
 
-  const buy = async (
-    itemType: "plan" | "credits",
-    itemId: string,
-    amount: number,
-    onSuccess: () => void,
-  ) => {
+  const buy = async (itemType: "plan" | "credits", itemId: string, amount: number, onSuccess: () => void) => {
     try {
-      const result = await startCheckout({
-        itemType,
-        itemId,
+      await startCheckout({
         amount,
+        itemId,
         ...(user ? { userName: user.name, userEmail: user.email } : {}),
+        onSuccess: () => {
+          onSuccess();
+          toast.success("Payment verified successfully");
+        },
       });
-      if (result.success) {
-        onSuccess();
-        toast.success("Payment successful");
-      }
     } catch (error) {
-      toast.error("Payment unavailable", {
+      toast.error("Payment failed", {
         description: error instanceof Error ? error.message : "Please try again later.",
       });
     }

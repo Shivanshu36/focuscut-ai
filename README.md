@@ -1,5 +1,20 @@
 # SnapCut AI Studio
 
+## Local and Vercel configuration
+
+The frontend does not depend on the Vercel deployment. Local development and the Vercel deployment each load their own Vite environment variables and call the n8n webhooks directly.
+
+For local development, copy `.env.example` to `.env.local` and set the n8n webhook base URL. Start the app from this directory with:
+
+```bash
+npm install
+npm run dev
+```
+
+For Vercel, add the `VITE_N8N_API_URL` value in Project Settings → Environment Variables, then redeploy.
+
+The n8n workflow must allow browser requests from both `http://localhost:5173` and the Vercel domain.
+
 You are an expert senior full-stack developer, UI/UX designer, product architect, and SaaS engineer.
 
 Build a complete, modern, production-ready SaaS web application called:
@@ -88,9 +103,7 @@ Backend / Automation:
 
 Payments:
 
-- Razorpay
-
-- Razorpay Payment Gateway
+- Payment provider to be configured
 
 Deployment:
 
@@ -982,11 +995,11 @@ The exact prices and credits should be easy to change from a configuration file.
 
 ====================================================
 
-14. RAZORPAY PAYMENT INTEGRATION
+14. PAYMENT INTEGRATION
 
 ====================================================
 
-Use Razorpay as the payment provider.
+Use a secure payment provider through the backend.
 
 Payment flow:
 
@@ -996,9 +1009,9 @@ Payment flow:
 
 3. Frontend requests payment/order creation through backend/n8n
 
-4. Backend creates or prepares the Razorpay payment
+4. Backend creates or prepares the payment
 
-5. Razorpay Checkout opens
+5. Hosted checkout opens
 
 6. User completes payment
 
@@ -1010,7 +1023,7 @@ Payment flow:
 
 IMPORTANT:
 
-Never expose Razorpay secret keys in the frontend.
+Never expose payment secrets in the frontend.
 
 Use environment variables and backend workflows for sensitive operations.
 
@@ -1312,7 +1325,7 @@ Include:
 
 - n8n webhook integration layer
 
-- Razorpay payment architecture
+- Payment architecture
 
 - Credits system
 

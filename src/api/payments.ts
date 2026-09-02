@@ -1,30 +1,29 @@
-import { apiRequest, isBackendConfigured } from "@/api/client";
-import { RAZORPAY_KEY_ID, APP_NAME } from "@/config/app";
-
 type RazorpayOrder = {
-  orderId: string;
+  order_id: string;
   amount: number;
   currency: string;
-  keyId?: string;
 };
 
-type CheckoutArgs = {
-  itemId: string;
-  itemType: "plan" | "credits";
-  amount: number;
-  userName?: string;
-  userEmail?: string;
+type RazorpaySuccess = {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
 };
 
 declare global {
   interface Window {
-    Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
+    Razorpay?: new (options: Record<string, unknown>) => {
+      open: () => void;
+    };
   }
 }
 
 function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve) => {
-    if (window.Razorpay) return resolve(true);
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.onload = () => resolve(true);
@@ -33,47 +32,52 @@ function loadRazorpayScript(): Promise<boolean> {
   });
 }
 
-/** Order creation and verification always happen server-side (n8n). */
-export const createOrder = (args: CheckoutArgs) =>
-  apiRequest<RazorpayOrder>("payments/create-order", { body: args });
+async function readResponse<T>(response: Response): Promise<T> {
+  const body = (await response.json()) as { error?: string } & T;
+  if (!response.ok) throw new Error(body.error ?? "Payment request failed.");
+  return body;
+}
 
-export const verifyPayment = (payload: Record<string, unknown>) =>
-  apiRequest<{ success: boolean; credits?: number; plan?: string }>("payments/verify", {
-    body: payload,
+export async function startCheckout(args: {
+  amount: number;
+  itemId: string;
+  userName?: string;
+  userEmail?: string;
+  onSuccess: (result: RazorpaySuccess) => void;
+}) {
+  const orderResponse = await fetch("/api/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount: Math.round(args.amount * 100), currency: "INR", receipt: args.itemId }),
   });
+  const order = await readResponse<RazorpayOrder>(orderResponse);
+  if (!(await loadRazorpayScript())) throw new Error("Could not load the payment checkout.");
 
-/**
- * Opens Razorpay Checkout. Secrets never touch the browser: only the
- * publishable key id is used here, verification is done by the backend.
- */
-export async function startCheckout(args: CheckoutArgs) {
-  if (!isBackendConfigured()) {
-    throw new Error("Payments are not connected yet. Configure VITE_N8N_API_URL to enable them.");
-  }
-
-  const order = await createOrder(args);
-  const ready = await loadRazorpayScript();
-  if (!ready) throw new Error("Could not load Razorpay Checkout. Please retry.");
-
-  return new Promise<{ success: boolean; credits?: number; plan?: string }>((resolve, reject) => {
-    const rzp = new window.Razorpay!({
-      key: order.keyId ?? RAZORPAY_KEY_ID,
-      order_id: order.orderId,
+  return new Promise<void>((resolve, reject) => {
+    const checkout = new window.Razorpay!({
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      order_id: order.order_id,
       amount: order.amount,
-      currency: order.currency ?? "INR",
-      name: APP_NAME,
-      description: args.itemType === "plan" ? `${args.itemId} plan` : `${args.itemId} credit pack`,
+      currency: order.currency,
+      name: "SnapCut AI",
+      description: args.itemId,
       prefill: { name: args.userName ?? "", email: args.userEmail ?? "" },
-      theme: { color: "#6C2CF4" },
-      handler: (response: Record<string, unknown>) => {
-        verifyPayment({ ...response, itemId: args.itemId, itemType: args.itemType })
-          .then(resolve)
-          .catch(reject);
+      handler: async (result: RazorpaySuccess) => {
+        try {
+          const verificationResponse = await fetch("/api/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(result),
+          });
+          await readResponse<{ success: boolean }>(verificationResponse);
+          args.onSuccess(result);
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
       },
-      modal: {
-        ondismiss: () => reject(new Error("Payment cancelled.")),
-      },
+      modal: { ondismiss: () => reject(new Error("Payment cancelled.")) },
     });
-    rzp.open();
+    checkout.open();
   });
 }

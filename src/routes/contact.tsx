@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Mail, MessageSquare, Clock } from "lucide-react";
+import { Mail, MessageSquare, Clock, MapPin, Phone } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,7 +62,9 @@ function ContactPage() {
         <ul className="mt-8 space-y-5">
           {[
             { icon: Mail, title: "Email", text: "support@snapcut.ai" },
-            { icon: MessageSquare, title: "Support", text: "Help with credits, plans and results" },
+            { icon: Phone, title: "Phone", text: "Add your support phone number" },
+            { icon: MapPin, title: "Business address", text: "Add your registered business address" },
+            { icon: MessageSquare, title: "Trade name", text: "SnapCut AI" },
             { icon: Clock, title: "Response time", text: "Within one business day" },
           ].map((item) => (
             <li key={item.title} className="flex gap-4">

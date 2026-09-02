@@ -16,6 +16,7 @@ export function Footer() {
           <FooterLink to="/remove-background">Remove Background</FooterLink>
           <FooterLink to="/pricing">Pricing</FooterLink>
           <FooterLink to="/dashboard">Dashboard</FooterLink>
+          <FooterLink to="/shipping">Shipping & Delivery</FooterLink>
         </FooterCol>
 
         <FooterCol title="Support">
@@ -26,6 +27,7 @@ export function Footer() {
 
         <FooterCol title="Legal">
           <FooterLink to="/privacy">Privacy Policy</FooterLink>
+          <FooterLink to="/refund">Refund & Cancellation</FooterLink>
           <FooterLink to="/terms">Terms of Service</FooterLink>
         </FooterCol>
       </div>

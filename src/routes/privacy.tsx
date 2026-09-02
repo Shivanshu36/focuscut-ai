@@ -24,11 +24,11 @@ const SECTIONS = [
   },
   {
     title: "How we use your images",
-    body: "Uploaded images are used solely to generate your background-removed result. They are not sold, shared with advertisers, or used to train third-party models.",
+    body: "Uploaded images are sent to our automation and image-processing providers solely to generate your background-removed result. They are not sold, shared with advertisers, or used to train third-party models.",
   },
   {
     title: "Storage and retention",
-    body: "Processed files are held in temporary storage only as long as needed to deliver your download, then removed automatically. Account data is retained while your account is active.",
+    body: "Processed files may be stored temporarily by our processing and delivery providers so we can return your result. Your completed results and recent activity may also be stored in your browser's local storage on this device. Account data is retained while your account is active.",
   },
   {
     title: "Cookies and local storage",
@@ -40,7 +40,7 @@ const SECTIONS = [
   },
   {
     title: "Contact",
-    body: "For privacy questions, email support@snapcut.ai and we will respond within one business day.",
+    body: "For privacy questions, email support@snapcut.ai and we will respond within one business day. Trade name: SnapCut AI. Please add your registered address and support phone number before submitting this page for payment-gateway approval.",
   },
 ];
 
