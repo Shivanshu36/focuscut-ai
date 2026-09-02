@@ -79,9 +79,8 @@ export function ToolWorkspace() {
         setProgress(100);
         setStage("result");
         setBackground("transparent");
-        if (user) {
-          addHistory({ name: incoming.name, status: "completed", thumbnail: imageUrl });
-        } else {
+        addHistory({ name: incoming.name, status: "completed", thumbnail: imageUrl });
+        if (!user) {
           localStorage.setItem(GUEST_KEY, String(Number(localStorage.getItem(GUEST_KEY) ?? "0") + 1));
         }
         toast.success("Background removed", { description: "Your transparent image is ready." });
@@ -118,7 +117,7 @@ export function ToolWorkspace() {
     try {
       const base = (file?.name ?? "snapcut").replace(/\.[^.]+$/, "");
       if (format === "png" && background === "transparent") {
-        downloadDataUrl(resultUrl, `${base}-snapcut.png`);
+        await downloadDataUrl(resultUrl, `${base}-snapcut.png`);
         return;
       }
       const color =
@@ -130,7 +129,7 @@ export function ToolWorkspace() {
         color,
         format === "png" ? "image/png" : "image/jpeg",
       );
-      downloadDataUrl(url, `${base}-snapcut.${format}`);
+      await downloadDataUrl(url, `${base}-snapcut.${format}`);
     } catch {
       toast.error("Download failed", { description: "Please try again." });
     }

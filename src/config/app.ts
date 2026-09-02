@@ -10,6 +10,9 @@ export const APP_NAME = env["VITE_APP_NAME"] ?? "SnapCut AI";
 /** n8n Cloud webhook base URL. All AI + payment work is proxied through it. */
 export const N8N_API_URL = (env["VITE_N8N_API_URL"] ?? "").replace(/\/$/, "");
 
+export const REMOVE_BACKGROUND_WEBHOOK_URL =
+  "https://shivanshucs.app.n8n.cloud/webhook/remove-background";
+
 /** Razorpay public key id (publishable, safe in the client). */
 export const RAZORPAY_KEY_ID = env["VITE_RAZORPAY_KEY_ID"] ?? "";
 

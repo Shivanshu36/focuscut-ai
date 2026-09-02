@@ -1,5 +1,5 @@
-import { apiRequest, isBackendConfigured } from "@/api/client";
-import { localBackgroundRemoval } from "@/utils/image";
+import { apiRequest } from "@/api/client";
+import { REMOVE_BACKGROUND_WEBHOOK_URL } from "@/config/app";
 
 export type RemovalResult = {
   /** PNG with transparent background (URL or data URL). */
@@ -15,7 +15,15 @@ type WebhookResponse = {
   base64?: string;
 };
 
-function normalize(payload: WebhookResponse | string): string | null {
+async function normalize(payload: WebhookResponse | string | Blob): Promise<string | null> {
+  if (payload instanceof Blob) {
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : null);
+      reader.onerror = () => reject(new Error("The AI service returned an unreadable image."));
+      reader.readAsDataURL(payload);
+    });
+  }
   if (typeof payload === "string") {
     return payload.startsWith("http") || payload.startsWith("data:") ? payload : null;
   }
@@ -33,20 +41,13 @@ export async function removeBackground(
   file: File,
   options: { signal?: AbortSignal } = {},
 ): Promise<RemovalResult> {
-  if (!isBackendConfigured()) {
-    return { imageUrl: await localBackgroundRemoval(file), provider: "local" };
-  }
-
-  const form = new FormData();
-  form.append("image", file, file.name);
-
-  const payload = await apiRequest<WebhookResponse | string>("remove-background", {
-    body: form,
+  const payload = await apiRequest<WebhookResponse | string | Blob>(REMOVE_BACKGROUND_WEBHOOK_URL, {
+    body: file,
     timeoutMs: 90_000,
     ...(options.signal ? { signal: options.signal } : {}),
   });
 
-  const imageUrl = normalize(payload);
+  const imageUrl = await normalize(payload);
   if (!imageUrl) throw new Error("The AI service returned an unexpected response.");
   return { imageUrl, provider: "n8n" };
 }

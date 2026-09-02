@@ -29,6 +29,7 @@ export type User = {
 
 type AuthContextValue = {
   user: User | null;
+  history: HistoryItem[];
   ready: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
@@ -41,6 +42,7 @@ type AuthContextValue = {
 };
 
 const STORAGE_KEY = "snapcut.user";
+const HISTORY_STORAGE_KEY = "snapcut.history";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -51,12 +53,21 @@ const AuthContext = createContext<AuthContextValue | null>(null);
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setUser(JSON.parse(raw) as User);
+      const storedUser = raw ? (JSON.parse(raw) as User) : null;
+      if (storedUser) setUser(storedUser);
+      const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
+      if (storedHistory) {
+        setHistory(JSON.parse(storedHistory) as HistoryItem[]);
+      } else if (storedUser?.history.length) {
+        setHistory(storedUser.history);
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(storedUser.history));
+      }
     } catch {
       /* ignore corrupt state */
     }
@@ -154,13 +165,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addHistory = useCallback((item: Omit<HistoryItem, "id" | "date">) => {
+    const entry: HistoryItem = {
+      ...item,
+      id: crypto.randomUUID(),
+      date: new Date().toISOString(),
+    };
+    setHistory((prev) => {
+      const next = [entry, ...prev].slice(0, 50);
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
     setUser((prev) => {
       if (!prev) return prev;
-      const entry: HistoryItem = {
-        ...item,
-        id: crypto.randomUUID(),
-        date: new Date().toISOString(),
-      };
       const next = { ...prev, history: [entry, ...prev.history].slice(0, 12) };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       return next;
@@ -170,6 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
+      history,
       ready,
       login,
       signup,
@@ -182,6 +199,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }),
     [
       user,
+      history,
       ready,
       login,
       signup,

@@ -1,16 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import logo from "@/assets/snapcut-logo.png.asset.json";
 import { cn } from "@/lib/utils";
 
 export function Logo({ className }: { className?: string }) {
   return (
     <Link to="/" aria-label="SnapCut AI home" className={cn("inline-flex items-center", className)}>
       <img
-        src={logo.url}
+        src="/favicon.png"
         alt="SnapCut AI"
-        width={180}
-        height={44}
-        className="h-9 w-auto sm:h-10"
+        width={40}
+        height={40}
+        className="h-9 w-9 sm:h-10 sm:w-10"
       />
     </Link>
   );

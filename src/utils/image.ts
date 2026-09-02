@@ -40,13 +40,24 @@ export async function compositeOnColor(src: string, color: string, mime = "image
   return canvas.toDataURL(mime, 0.92);
 }
 
-export function downloadDataUrl(url: string, filename: string) {
+export async function downloadDataUrl(url: string, filename: string) {
+  let downloadUrl = url;
+  let objectUrl: string | null = null;
+
+  if (url.startsWith("http")) {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Could not download the image.");
+    objectUrl = URL.createObjectURL(await response.blob());
+    downloadUrl = objectUrl;
+  }
+
   const a = document.createElement("a");
-  a.href = url;
+  a.href = downloadUrl;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
+  if (objectUrl) URL.revokeObjectURL(objectUrl);
 }
 
 /**

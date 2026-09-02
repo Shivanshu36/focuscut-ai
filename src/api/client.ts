@@ -13,7 +13,7 @@ export const isBackendConfigured = () => Boolean(N8N_API_URL);
 
 type RequestOptions = {
   method?: string;
-  body?: unknown;
+  body?: BodyInit | unknown;
   timeoutMs?: number;
   signal?: AbortSignal;
 };
@@ -24,7 +24,10 @@ type RequestOptions = {
  * are handled in exactly one place.
  */
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  if (!isBackendConfigured()) {
+  const target = path.startsWith("http")
+    ? path
+    : `${N8N_API_URL}/${path.replace(/^\//, "")}`;
+  if (!isBackendConfigured() && !path.startsWith("http")) {
     throw new ApiError("Backend is not configured. Set VITE_N8N_API_URL to enable this feature.");
   }
 
@@ -33,22 +36,27 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   signal?.addEventListener("abort", () => controller.abort());
 
-  const isForm = body instanceof FormData;
+    const isBinary = body instanceof Blob;
 
   try {
     const init: RequestInit = { method, signal: controller.signal };
     if (body !== undefined) {
-      init.body = isForm ? (body as FormData) : JSON.stringify(body);
-      if (!isForm) init.headers = { "Content-Type": "application/json" };
+      init.body = isBinary || body instanceof FormData ? body : JSON.stringify(body);
+      if (!isBinary && !(body instanceof FormData)) {
+        init.headers = { "Content-Type": "application/json" };
+      } else if (isBinary) {
+        init.headers = { "Content-Type": (body as Blob).type || "application/octet-stream" };
+      }
     }
 
-    const response = await fetch(`${N8N_API_URL}/${path.replace(/^\//, "")}`, init);
+    const response = await fetch(target, init);
 
     if (!response.ok) {
       throw new ApiError(`Request failed (${response.status}).`, response.status);
     }
 
     const contentType = response.headers.get("content-type") ?? "";
+    if (contentType.startsWith("image/")) return (await response.blob()) as T;
     if (contentType.includes("application/json")) return (await response.json()) as T;
     return (await response.text()) as unknown as T;
   } catch (error) {
